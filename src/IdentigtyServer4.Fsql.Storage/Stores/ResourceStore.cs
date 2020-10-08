@@ -116,8 +116,7 @@ namespace IdentityServer4.Fsql.Storage.Stores
                 .IncludeMany(x => x.UserClaims)
                 .IncludeMany(x => x.Properties);
 
-            var results = (await resources.ToListAsync())
-                .Where(x => scopes.Contains(x.Name));
+            var results = await resources.ToListAsync();
 
             Logger.LogDebug("Found {scopes} identity scopes in database", results.Select(x => x.Name));
 
@@ -139,8 +138,7 @@ namespace IdentityServer4.Fsql.Storage.Stores
                 .IncludeMany(x => x.UserClaims)
                 .IncludeMany(x => x.Properties);
 
-            var results = (await resources.ToListAsync())
-                .Where(x => scopes.Contains(x.Name));
+            var results = await resources.ToListAsync();
 
             Logger.LogDebug("Found {scopes} scopes in database", results.Select(x => x.Name));
 

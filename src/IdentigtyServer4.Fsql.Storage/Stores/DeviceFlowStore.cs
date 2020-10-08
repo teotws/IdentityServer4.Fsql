@@ -134,15 +134,15 @@ namespace IdentityServer4.Fsql.Storage.Stores
         /// <returns></returns>
         public virtual async Task RemoveByDeviceCodeAsync(string deviceCode)
         {
-            var deviceFlowCodes = await FreeSql.Select<Entities.DeviceFlowCodes>().Where(x => x.DeviceCode == deviceCode).FirstAsync();
+            var deviceFlowCodes = await FreeSql.Select<Entities.DeviceFlowCodes>().Where(x => x.DeviceCode == deviceCode).AnyAsync();
 
-            if (deviceFlowCodes != null)
+            if (deviceFlowCodes)
             {
                 Logger.LogDebug("removing {deviceCode} device code from database", deviceCode);
 
                 try
                 {
-                    await FreeSql.Delete<Entities.DeviceFlowCodes>(deviceFlowCodes).ExecuteAffrowsAsync();
+                    await FreeSql.Select<Entities.DeviceFlowCodes>().Where(x => x.DeviceCode == deviceCode).ToDelete().ExecuteAffrowsAsync();
                 }
                 catch (Exception ex)
                 {
