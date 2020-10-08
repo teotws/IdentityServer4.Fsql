@@ -8,7 +8,7 @@ using System.Linq;
 using Xunit;
 using ApiResource = IdentityServer4.Models.ApiResource;
 
-namespace IdentityServer4.EntityFramework.UnitTests.Mappers
+namespace IdentityServer4.Fsql.UnitTests.Mappers
 {
     public class ApiResourceMappersTests
     {
