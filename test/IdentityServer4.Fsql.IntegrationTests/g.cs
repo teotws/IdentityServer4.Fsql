@@ -23,7 +23,7 @@ namespace IdentityServer4.Fsql.IntegrationTests
 
         public static IFreeSql<ConfigurationDb> configurationDb => configurationDbLazy;
 
-        static Lazy<IFreeSql<OperationalDb>> operationalDbLazy = new Lazy<IFreeSql<OperationalDb>>(() => new FreeSql.FreeSqlBuilder()
+        static IFreeSql<OperationalDb> operationalDbLazy =  new FreeSql.FreeSqlBuilder()
             .UseConnectionString(FreeSql.DataType.Sqlite, @"Data Source=./operational.db;")
             .UseAutoSyncStructure(true)
             //.UseGenerateCommandParameterWithLambda(true)
@@ -32,10 +32,9 @@ namespace IdentityServer4.Fsql.IntegrationTests
                 cmd => Trace.WriteLine("\r\n线程" + Thread.CurrentThread.ManagedThreadId + ": " + cmd.CommandText) //监听SQL命令对象，在执行前
                                                                                                                  //, (cmd, traceLog) => Console.WriteLine(traceLog)
                 )
-            .Build<OperationalDb>());
+            .Build<OperationalDb>()
+            .ConfigurePersistedGrantContext();
 
-
-
-        public static IFreeSql<OperationalDb> operationalDb => operationalDbLazy.Value;
+        public static IFreeSql<OperationalDb> operationalDb => operationalDbLazy;
     }
 }

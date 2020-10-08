@@ -152,6 +152,263 @@ namespace IdentityServer4.Fsql.IntegrationTests.Stores
             Assert.NotNull(resources.Single(x => x.Name == testApiResource.Name));
         }
 
+        [Fact]
+        public async Task FindApiResourcesByScopeNameAsync_WhenResourcesExist_ExpectOnlyResourcesRequestedReturned()
+        {
+            var testIdentityResource = CreateIdentityTestResource();
+            var testApiResource = CreateApiResourceTestResource();
+            var testApiScope = CreateApiScopeTestResource();
+            testApiResource.Scopes.Add(testApiScope.Name);
+
+            var identityResourcesRepo = g.configurationDb.GetRepository<Storage.Entities.IdentityResource>();
+            var apiResourcesRepo = g.configurationDb.GetRepository<Storage.Entities.ApiResource>();
+            var apiScopesRepo = g.configurationDb.GetRepository<Storage.Entities.ApiScope>();
+
+            var testIdentityResourceEntity = testIdentityResource.ToEntity();
+            identityResourcesRepo.Insert(testIdentityResourceEntity);
+            identityResourcesRepo.SaveMany(testIdentityResourceEntity, "UserClaims");
+            identityResourcesRepo.SaveMany(testIdentityResourceEntity, "Properties");
+
+            var testApiResourceEntity = testApiResource.ToEntity();
+            apiResourcesRepo.Insert(testApiResourceEntity);
+            apiResourcesRepo.SaveMany(testApiResourceEntity, "Secrets");
+            apiResourcesRepo.SaveMany(testApiResourceEntity, "Scopes");
+            apiResourcesRepo.SaveMany(testApiResourceEntity, "UserClaims");
+            apiResourcesRepo.SaveMany(testApiResourceEntity, "Properties");
+
+            var testApiScopeEntity = testApiScope.ToEntity();
+            apiScopesRepo.Insert(testApiScopeEntity);
+            apiScopesRepo.SaveMany(testApiScopeEntity, "UserClaims");
+            apiScopesRepo.SaveMany(testApiScopeEntity, "Properties");
+
+            var testIdentityResourceEntity2 = CreateIdentityTestResource().ToEntity();
+            identityResourcesRepo.Insert(testIdentityResourceEntity2);
+            identityResourcesRepo.SaveMany(testIdentityResourceEntity2, "UserClaims");
+            identityResourcesRepo.SaveMany(testIdentityResourceEntity2, "Properties");
+
+            var testApiResourceEntity2 = CreateApiResourceTestResource().ToEntity();
+            apiResourcesRepo.Insert(testApiResourceEntity2);
+            apiResourcesRepo.SaveMany(testApiResourceEntity2, "Secrets");
+            apiResourcesRepo.SaveMany(testApiResourceEntity2, "Scopes");
+            apiResourcesRepo.SaveMany(testApiResourceEntity2, "UserClaims");
+            apiResourcesRepo.SaveMany(testApiResourceEntity2, "Properties");
+
+            var testApiScopeEntity2 = CreateApiScopeTestResource().ToEntity();
+            apiScopesRepo.Insert(testApiScopeEntity2);
+            apiScopesRepo.SaveMany(testApiScopeEntity2, "UserClaims");
+            apiScopesRepo.SaveMany(testApiScopeEntity2, "Properties");
+
+            IEnumerable<ApiResource> resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = await store.FindApiResourcesByScopeNameAsync(new[] { testApiScope.Name });
+
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources);
+            Assert.NotNull(resources.Single(x => x.Name == testApiResource.Name));
+        }
+
+
+
+
+        [Fact]
+        public async Task FindIdentityResourcesByScopeNameAsync_WhenResourceExists_ExpectResourceAndCollectionsReturned()
+        {
+            var resource = CreateIdentityTestResource();
+
+            var entity = resource.ToEntity();
+
+            var repo = g.configurationDb.GetRepository<Storage.Entities.IdentityResource>();
+            repo.Insert(entity);
+            repo.SaveMany(entity, "UserClaims");
+            repo.SaveMany(entity, "Properties");
+
+            IList<IdentityResource> resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = (await store.FindIdentityResourcesByScopeNameAsync(new List<string>
+            {
+                resource.Name
+            })).ToList();
+
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources);
+            var foundScope = resources.Single();
+
+            Assert.Equal(resource.Name, foundScope.Name);
+            Assert.NotNull(foundScope.UserClaims);
+            Assert.NotEmpty(foundScope.UserClaims);
+        }
+
+        [Fact]
+        public async Task FindIdentityResourcesByScopeNameAsync_WhenResourcesExist_ExpectOnlyRequestedReturned()
+        {
+            var resource = CreateIdentityTestResource();
+
+            var entity = resource.ToEntity();
+
+            var repo = g.configurationDb.GetRepository<Storage.Entities.IdentityResource>();
+            repo.Insert(entity);
+            repo.SaveMany(entity, "UserClaims");
+            repo.SaveMany(entity, "Properties");
+
+            IList<IdentityResource> resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = (await store.FindIdentityResourcesByScopeNameAsync(new List<string>
+                {
+                    resource.Name
+                })).ToList();
+
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources);
+            Assert.NotNull(resources.Single(x => x.Name == resource.Name));
+        }
+
+
+
+        [Fact]
+        public async Task FindApiScopesByNameAsync_WhenResourceExists_ExpectResourceAndCollectionsReturned()
+        {
+            var resource = CreateApiScopeTestResource();
+
+            var entity = resource.ToEntity();
+
+            var repo = g.configurationDb.GetRepository<Storage.Entities.ApiScope>();
+
+            repo.Insert(entity);
+            repo.SaveMany(entity, "UserClaims");
+            repo.SaveMany(entity, "Properties");
+
+            IList<ApiScope> resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = (await store.FindApiScopesByNameAsync(new List<string>
+            {
+                resource.Name
+            })).ToList();
+
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources);
+            var foundScope = resources.Single();
+
+            Assert.Equal(resource.Name, foundScope.Name);
+            Assert.NotNull(foundScope.UserClaims);
+            Assert.NotEmpty(foundScope.UserClaims);
+        }
+
+        [Fact]
+        public async Task FindApiScopesByNameAsync_WhenResourcesExist_ExpectOnlyRequestedReturned()
+        {
+            var resource = CreateApiScopeTestResource();
+
+            var entity = resource.ToEntity();
+
+            var repo = g.configurationDb.GetRepository<Storage.Entities.ApiScope>();
+
+            repo.Insert(entity);
+            repo.SaveMany(entity, "UserClaims");
+            repo.SaveMany(entity, "Properties");
+
+            IList<ApiScope> resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = (await store.FindApiScopesByNameAsync(new List<string>
+            {
+                resource.Name
+            })).ToList();
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources);
+            Assert.NotNull(resources.Single(x => x.Name == resource.Name));
+        }
+
+
+
+
+        [Fact]
+        public async Task GetAllResources_WhenAllResourcesRequested_ExpectAllResourcesIncludingHidden()
+        {
+            var visibleIdentityResource = CreateIdentityTestResource();
+            var visibleApiResource = CreateApiResourceTestResource();
+            var visibleApiScope = CreateApiScopeTestResource();
+            var hiddenIdentityResource = new IdentityResource { Name = Guid.NewGuid().ToString(), ShowInDiscoveryDocument = false };
+            var hiddenApiResource = new ApiResource
+            {
+                Name = Guid.NewGuid().ToString(),
+                Scopes = { Guid.NewGuid().ToString() },
+                ShowInDiscoveryDocument = false
+            };
+            var hiddenApiScope = new ApiScope
+            {
+                Name = Guid.NewGuid().ToString(),
+                ShowInDiscoveryDocument = false
+            };
+
+            var identityResourcesRepo = g.configurationDb.GetRepository<Storage.Entities.IdentityResource>();
+            var apiResourcesRepo = g.configurationDb.GetRepository<Storage.Entities.ApiResource>();
+            var apiScopesRepo = g.configurationDb.GetRepository<Storage.Entities.ApiScope>();
+
+            var visibleIdentityResourceEntity = visibleIdentityResource.ToEntity();
+            identityResourcesRepo.Insert(visibleIdentityResourceEntity);
+            identityResourcesRepo.SaveMany(visibleIdentityResourceEntity, "UserClaims");
+            identityResourcesRepo.SaveMany(visibleIdentityResourceEntity, "Properties");
+
+            var visibleApiResourceEntity = visibleApiResource.ToEntity();
+            apiResourcesRepo.Insert(visibleApiResourceEntity);
+            apiResourcesRepo.SaveMany(visibleApiResourceEntity, "Secrets");
+            apiResourcesRepo.SaveMany(visibleApiResourceEntity, "Scopes");
+            apiResourcesRepo.SaveMany(visibleApiResourceEntity, "UserClaims");
+            apiResourcesRepo.SaveMany(visibleApiResourceEntity, "Properties");
+
+            var visibleApiScopeEntity = visibleApiScope.ToEntity();
+            apiScopesRepo.Insert(visibleApiScopeEntity);
+            apiScopesRepo.SaveMany(visibleApiScopeEntity, "UserClaims");
+            apiScopesRepo.SaveMany(visibleApiScopeEntity, "Properties");
+
+            var hiddenIdentityResourceEntity = hiddenIdentityResource.ToEntity();
+            identityResourcesRepo.Insert(hiddenIdentityResourceEntity);
+            identityResourcesRepo.SaveMany(hiddenIdentityResourceEntity, "UserClaims");
+            identityResourcesRepo.SaveMany(hiddenIdentityResourceEntity, "Properties");
+
+            var hiddenApiResourceEntity = hiddenApiResource.ToEntity();
+            apiResourcesRepo.Insert(hiddenApiResourceEntity);
+            apiResourcesRepo.SaveMany(hiddenApiResourceEntity, "Secrets");
+            apiResourcesRepo.SaveMany(hiddenApiResourceEntity, "Scopes");
+            apiResourcesRepo.SaveMany(hiddenApiResourceEntity, "UserClaims");
+            apiResourcesRepo.SaveMany(hiddenApiResourceEntity, "Properties");
+
+            var hiddenApiScopeEntity = hiddenApiScope.ToEntity();
+            apiScopesRepo.Insert(hiddenApiScopeEntity);
+            apiScopesRepo.SaveMany(hiddenApiScopeEntity, "UserClaims");
+            apiScopesRepo.SaveMany(hiddenApiScopeEntity, "Properties");
+
+
+            Resources resources;
+
+            var store = new ResourceStore(g.configurationDb, FakeLogger<ResourceStore>.Create());
+            resources = await store.GetAllResourcesAsync();
+
+
+            Assert.NotNull(resources);
+            Assert.NotEmpty(resources.IdentityResources);
+            Assert.NotEmpty(resources.ApiResources);
+            Assert.NotEmpty(resources.ApiScopes);
+
+            Assert.Contains(resources.IdentityResources, x => x.Name == visibleIdentityResource.Name);
+            Assert.Contains(resources.IdentityResources, x => x.Name == hiddenIdentityResource.Name);
+
+            Assert.Contains(resources.ApiResources, x => x.Name == visibleApiResource.Name);
+            Assert.Contains(resources.ApiResources, x => x.Name == hiddenApiResource.Name);
+
+            Assert.Contains(resources.ApiScopes, x => x.Name == visibleApiScope.Name);
+            Assert.Contains(resources.ApiScopes, x => x.Name == hiddenApiScope.Name);
+        }
+
 
     }
 }

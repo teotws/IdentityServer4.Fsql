@@ -227,7 +227,7 @@ namespace IdentityServer4.Fsql.Storage.Extensions
         /// </summary>
         /// <param name="fsql.CodeFirst">The model builder.</param>
         /// <param name="storeOptions">The store options.</param>
-        public static void ConfigurePersistedGrantContext(this IFreeSql fsql)
+        public static IFreeSql<OperationalDb> ConfigurePersistedGrantContext(this IFreeSql<OperationalDb> fsql)
         {
             fsql.Aop.ConfigEntityProperty += (s, e) =>
             {
@@ -279,6 +279,8 @@ namespace IdentityServer4.Fsql.Storage.Extensions
                 codes.HasIndex(x => x.DeviceCode).IsUnique();
                 codes.HasIndex(x => x.Expiration);
             });
+
+            return fsql;
         }
 
 

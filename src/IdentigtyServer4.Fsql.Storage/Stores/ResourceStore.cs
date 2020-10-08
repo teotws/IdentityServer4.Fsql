@@ -113,8 +113,8 @@ namespace IdentityServer4.Fsql.Storage.Stores
             var query = FreeSql.Select<Entities.IdentityResource>().Where(x => scopes.Contains(x.Name));
 
             var resources = query
-                .Include(x => x.UserClaims)
-                .Include(x => x.Properties);
+                .IncludeMany(x => x.UserClaims)
+                .IncludeMany(x => x.Properties);
 
             var results = (await resources.ToListAsync())
                 .Where(x => scopes.Contains(x.Name));
