@@ -1,10 +1,12 @@
+using IdentityServer4.Fsql.Storage.DbMark;
 using IdentityServer4.Fsql.Storage.Entities;
+using System.Linq;
 
 namespace IdentityServer4.Fsql.Storage.Extensions
 {
     public static class SyncStructureExtensions
     {
-        public static void SyncStructureClient(this IFreeSql fsql)
+        public static IFreeSql<ConfigurationDb> SyncStructureClient(this IFreeSql<ConfigurationDb> fsql)
         {
             fsql.CodeFirst.SyncStructure<Client>();
             fsql.CodeFirst.SyncStructure<ClientGrantType>();
@@ -16,9 +18,10 @@ namespace IdentityServer4.Fsql.Storage.Extensions
             fsql.CodeFirst.SyncStructure<ClientIdPRestriction>();
             fsql.CodeFirst.SyncStructure<ClientCorsOrigin>();
             fsql.CodeFirst.SyncStructure<ClientProperty>();
+            return fsql;
         }
 
-        public static void SyncStructureResources(this IFreeSql fsql)
+        public static IFreeSql<ConfigurationDb> SyncStructureResources(this IFreeSql<ConfigurationDb> fsql)
         {
             fsql.CodeFirst.SyncStructure<IdentityResource>();
             fsql.CodeFirst.SyncStructure<IdentityResourceClaim>();
@@ -31,12 +34,14 @@ namespace IdentityServer4.Fsql.Storage.Extensions
             fsql.CodeFirst.SyncStructure<ApiScope>();
             fsql.CodeFirst.SyncStructure<ApiScopeClaim>();
             fsql.CodeFirst.SyncStructure<ApiScopeProperty>();
+            return fsql;
         }
 
-        public static void SyncStructurePersistedGrant(this IFreeSql fsql)
+        public static IFreeSql<OperationalDb> SyncStructurePersistedGrant(this IFreeSql<OperationalDb> fsql)
         {
             fsql.CodeFirst.SyncStructure<PersistedGrant>();
             fsql.CodeFirst.SyncStructure<DeviceFlowCodes>();
+            return fsql;
         }
 
     }

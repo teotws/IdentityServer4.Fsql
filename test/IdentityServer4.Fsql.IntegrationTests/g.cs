@@ -10,7 +10,7 @@ namespace IdentityServer4.Fsql.IntegrationTests
     {
         static IFreeSql<ConfigurationDb> configurationDbLazy = new FreeSql.FreeSqlBuilder()
             .UseConnectionString(FreeSql.DataType.Sqlite, @"Data Source=./configuration.db;")
-            .UseAutoSyncStructure(true)
+            .UseAutoSyncStructure(false)
             //.UseGenerateCommandParameterWithLambda(true)
             .UseLazyLoading(true)
             .UseMonitorCommand(
@@ -19,13 +19,15 @@ namespace IdentityServer4.Fsql.IntegrationTests
                 )
             .Build<ConfigurationDb>()
             .ConfigureClientContext()
-            .ConfigureResourcesContext();
+            .ConfigureResourcesContext()
+            .SyncStructureClient()
+            .SyncStructureResources();
 
         public static IFreeSql<ConfigurationDb> configurationDb => configurationDbLazy;
 
-        static IFreeSql<OperationalDb> operationalDbLazy =  new FreeSql.FreeSqlBuilder()
+        static IFreeSql<OperationalDb> operationalDbLazy = new FreeSql.FreeSqlBuilder()
             .UseConnectionString(FreeSql.DataType.Sqlite, @"Data Source=./operational.db;")
-            .UseAutoSyncStructure(true)
+            .UseAutoSyncStructure(false)
             //.UseGenerateCommandParameterWithLambda(true)
             .UseLazyLoading(true)
             .UseMonitorCommand(
@@ -33,7 +35,8 @@ namespace IdentityServer4.Fsql.IntegrationTests
                                                                                                                  //, (cmd, traceLog) => Console.WriteLine(traceLog)
                 )
             .Build<OperationalDb>()
-            .ConfigurePersistedGrantContext();
+            .ConfigurePersistedGrantContext()
+            .SyncStructurePersistedGrant();
 
         public static IFreeSql<OperationalDb> operationalDb => operationalDbLazy;
     }
