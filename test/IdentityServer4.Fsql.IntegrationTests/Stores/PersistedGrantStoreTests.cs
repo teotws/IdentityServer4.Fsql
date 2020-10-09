@@ -37,7 +37,7 @@ namespace IdentityServer4.Fsql.IntegrationTests.Stores
             var store = new PersistedGrantStore(g.operationalDb, FakeLogger<PersistedGrantStore>.Create());
             await store.StoreAsync(persistedGrant);
 
-            var foundGrant = g.operationalDb.Select<Storage.Entities.PersistedGrant>().First(x => x.Key == persistedGrant.Key);
+            var foundGrant = g.operationalDb.Select<Storage.Entities.PersistedGrant>().Where(x => x.Key == persistedGrant.Key).First();
             Assert.NotNull(foundGrant);
         }
 
